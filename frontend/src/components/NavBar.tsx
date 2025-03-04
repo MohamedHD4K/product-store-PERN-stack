@@ -6,7 +6,7 @@ import { BiSearch } from "react-icons/bi";
 
 const NavBar = () => {
   return (
-    <div className="bg-base-200/80 backdrop-blur-lg border-b border-base-content/10 sticky top-0 z-50">
+    <div className="bg-base-200/80 backdrop-blur-lg border-b border-base-content/10 sticky top-0 z-20">
       <div className="max-w-7xl mx-auto">
         <div className="navbar min-h-[4rem] justify-between">
           {/* LOGO */}

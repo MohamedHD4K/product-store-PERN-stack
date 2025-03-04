@@ -1,10 +1,11 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../components/LoadingSpinner";
 import AddProduct from "../components/AddProduct";
 import Product from "../components/Product";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Input from "../components/shared/Input";
 
 interface ProductType {
   image: string;
@@ -15,91 +16,98 @@ interface ProductType {
 }
 
 function HomePage() {
-  const [id, setId] = useState(0);
-  const navigate = useNavigate();
+  const [id, setId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const productsFetching = async () => {
+  const [value, setValue] = useState({
+    title: "",
+    description: "",
+    image: "",
+    price: "",
+  });
+
+  const fetchProducts = async () => {
     const response = await fetch("http://localhost:3000/api/products");
-
-    if (!response.ok) throw Error("Failed fetch products");
-
+    if (!response.ok) throw new Error("Failed to fetch products");
     return response.json();
   };
 
   const { data: productsData, isLoading } = useQuery({
-    queryKey: ["product"],
-    queryFn: productsFetching,
+    queryKey: ["products"],
+    queryFn: fetchProducts,
   });
 
-  const deleteProductFetching = async () => {
-    const response = await fetch(`http://localhost:3000/api/products/${id}`, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "DELETE",
-    });
+  const deleteProduct = async (productId: number) => {
+    const response = await fetch(
+      `http://localhost:3000/api/products/${productId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    if (!response.ok) throw Error("Failed Fetch Products");
-
-    return response.json();
-  };
-
-  const editProductFetching = async () => {
-    const response = await fetch(`http://localhost:3000/api/products/${id}`, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "PUT",
-    });
-
-    if (!response.ok) throw Error("Failed Fetch Products");
-
+    if (!response.ok) throw new Error("Failed to delete product");
     return response.json();
   };
 
   const { mutate: deleteMutate } = useMutation({
-    mutationKey: ["product"],
-    mutationFn: deleteProductFetching,
-    onError: (error) => {
-      toast.error("There was an error delete the product.");
-      console.log(error.message);
-    },
+    mutationFn: deleteProduct,
+    onError: () => toast.error("There was an error deleting the product."),
     onSuccess: () => {
       toast.success("Product deleted successfully!");
+      queryClient.invalidateQueries(["products"]);
     },
   });
 
-  const { mutate: editMutate } = useMutation({
-    mutationKey: ["product"],
-    mutationFn: editProductFetching,
-    onError: (error) => {
-      toast.error("There was an error delete the product.");
-      console.log(error.message);
-    },
-    onSuccess: () => {
-      toast.success("Product deleted successfully!");
-    },
-  });
+  const editProduct = async () => {
+    if (!id) return;
+    const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...value, price: Number(value.price) }),
+    });
 
-  const handleDeleteProduct = (_id: number) => {
-    setId(_id);
-    deleteMutate();
+    if (!response.ok) throw new Error("Failed to edit product");
+    return response.json();
   };
 
-  const handleEditProduct = (
-    event: React.FormEvent<HTMLButtonElement>,
-    _id: number
-  ) => {
+  const { mutate: editMutate } = useMutation({
+    mutationFn: editProduct,
+    onError: () => toast.error("There was an error editing the product."),
+    onSuccess: () => {
+      toast.success("Product edited successfully!");
+      queryClient.invalidateQueries(["products"]);
+      handleCloseModal();
+    },
+  });
+
+  const handleDeleteProduct = (productId: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    setId(_id);
+    deleteMutate(productId);
+  };
+
+  const handleEditProduct = (event: React.FormEvent) => {
+    event.preventDefault();
     editMutate();
   };
 
-  const handleShowModal = (event: React.FormEvent<HTMLButtonElement>) => {
+  const handleShowModal = (event: React.MouseEvent, product: ProductType) => {
     event.stopPropagation();
+    setId(product.id);
+    setValue({
+      title: product.title,
+      description: product.description,
+      image: product.image,
+      price: String(product.price),
+    });
     setIsModalOpen(true);
   };
 
@@ -107,20 +115,89 @@ function HomePage() {
     setIsModalOpen(false);
   };
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setValue((prev) => ({ ...prev, [name]: value }));
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = isModalOpen ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isModalOpen]);
+
   if (isLoading) return <LoadingSpinner />;
 
   return (
     <div className="mx-auto lg:max-w-7xl md:max-w-3xl sm:max-w-xl">
       <AddProduct />
       {isModalOpen && (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen z-30 bg-opacity-50">
-          <h1>Edit Product</h1>
-          <p>Update this product's details </p>
-          <div className="bg-base-200 md:w-sm p-4 rounded ">
-            <button className="btn btn-error" onClick={handleCloseModal}>
-              Close
-            </button>
-          </div>
+        <div className="fixed inset-0 flex flex-col items-center justify-center popup-animation bg-black/40 w-full h-screen z-30 bg-opacity-50">
+          <form
+            className="bg-base-200 p-4 px-6 rounded"
+            onSubmit={handleEditProduct}
+          >
+            <h1 className="font-bold text-2xl text-primary my-1">
+              Edit Product
+            </h1>
+            <p className="text-lg my-1">Update this product's details</p>
+
+            <div className="flex gap-4">
+              <img
+                src={value.image ? value.image : "no-image.jpeg"}
+                className="object-cover w-sm h-80 rounded"
+                alt="Product Preview"
+              />
+              <div className="flex w-sm flex-col gap-4">
+                <Input
+                  name="title"
+                  type="text"
+                  placeholder="Enter product name"
+                  label="Name"
+                  onChange={handleChange}
+                  value={value.title}
+                />
+                <Input
+                  name="description"
+                  type="text"
+                  placeholder="Enter product description"
+                  label="Description"
+                  onChange={handleChange}
+                  value={value.description}
+                />
+                <Input
+                  name="image"
+                  type="text"
+                  placeholder="Enter product image"
+                  label="Image"
+                  onChange={handleChange}
+                  value={value.image}
+                />
+                <Input
+                  name="price"
+                  type="number"
+                  placeholder="Enter product price"
+                  label="Price"
+                  onChange={handleChange}
+                  value={value.price}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-end gap-2 modal-action justify-end">
+              <button
+                className="btn btn-error rounded"
+                type="button"
+                onClick={handleCloseModal}
+              >
+                Close
+              </button>
+              <button type="submit" className="btn btn-success rounded">
+                Edit
+              </button>
+            </div>
+          </form>
         </div>
       )}
       <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-5 mx-1">
@@ -133,8 +210,8 @@ function HomePage() {
             title={product.title}
             description={product.description}
             price={product.price}
-            onDelete={() => handleDeleteProduct(product.id)}
-            onEdit={handleShowModal}
+            onDelete={(event) => handleDeleteProduct(product.id, event)}
+            onEdit={(event) => handleShowModal(event, product)}
             onShow={() => navigate(`/product/${product.id}`)}
           />
         ))}

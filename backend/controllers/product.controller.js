@@ -14,10 +14,10 @@ export const getProducts = async (req, res) => {
 
 export const getProduct = async (req, res) => {
     try {
-        const { title } = req.params
+        const { id } = req.params
 
-        const query = `SELECT * FROM products WHERE title=$1;`
-        const products = await pool.query(query, [title])
+        const query = `SELECT * FROM products WHERE id=$1;`
+        const products = await pool.query(query, [id])
 
         return res.status(200).json(products.rows)
     } catch (error) {

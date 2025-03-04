@@ -24,7 +24,7 @@ const Input: React.FC<InputType> = ({
         type={type}
         name={name}
         placeholder={placeholder}
-        className="input duration-150 w-full"
+        className="input duration-150 w-full rounded"
         onChange={onChange}
         value={value}
       />

@@ -2,10 +2,11 @@ import { BiPlus } from "react-icons/bi";
 import { LuRefreshCcw } from "react-icons/lu";
 import Input from "./shared/Input";
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
 
 const AddProduct = () => {
+  const queryClient = useQueryClient();
   const [value, setValue] = useState({
     title: "",
     description: "",
@@ -51,7 +52,14 @@ const AddProduct = () => {
     },
     onSuccess: () => {
       toast.success("Product Created Successfully!");
-      console.log(data);
+      queryClient.invalidateQueries(["products"]);
+      setValue({
+        title: "",
+        description: "",
+        image: "",
+        price: "",
+      });
+      setIsModalOpen(false);
     },
   });
 
@@ -75,19 +83,17 @@ const AddProduct = () => {
   return (
     <div className="flex justify-between items-center p-1 py-4">
       {isModalOpen && (
-        <dialog className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen  bg-opacity-50">
+        <dialog className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen z-30 bg-opacity-50">
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col bg-base-100 gap-4 z-40 popup-animation p-8 rounded-lg shadow-lg max-w-md w-full"
+            className="flex flex-col bg-base-100 gap-4 popup-animation p-8 rounded-lg shadow-lg max-w-md w-full"
           >
-            <h3 className="font-bold text-2xl text-primary text-center">
-              Add Prodcut
-            </h3>
+            <h3 className="font-bold text-2xl text-primary">Add Prodcut</h3>
             <Input
               name="title"
               type="text"
               placeholder="Enter product name"
-              label="Product Name"
+              label="Name"
               onChange={handleChange}
               value={value.title}
             />
@@ -95,7 +101,7 @@ const AddProduct = () => {
               name="description"
               type="text"
               placeholder="Enter product description"
-              label="Product Description"
+              label="Description"
               onChange={handleChange}
               value={value.description}
             />
@@ -103,7 +109,7 @@ const AddProduct = () => {
               name="image"
               type="text"
               placeholder="Enter product image"
-              label="Product Image"
+              label="Image"
               onChange={handleChange}
               value={value.image}
             />
@@ -111,15 +117,18 @@ const AddProduct = () => {
               name="price"
               type="text"
               placeholder="Enter product price"
-              label="Product Price"
+              label="Price"
               onChange={handleChange}
               value={value.price}
             />
             <div className="modal-action">
-              <button onClick={handleCloseModal} className="btn btn-error">
+              <button
+                onClick={handleCloseModal}
+                className="btn btn-error rounded"
+              >
                 Close
               </button>
-              <button type="submit" className="btn btn-success">
+              <button type="submit" className="btn btn-success rounded">
                 {isPending ? (
                   <span className="loading loading-spinner loading-sm mx-1.5"></span>
                 ) : (

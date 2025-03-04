@@ -2,6 +2,7 @@ import { MdOutlinePalette } from "react-icons/md";
 import { IoCartOutline } from "react-icons/io5";
 import { BsFolder } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import { BiSearch } from "react-icons/bi";
 
 const NavBar = () => {
   return (
@@ -22,6 +23,7 @@ const NavBar = () => {
           <div className="flex gap-10 justify-center">
             <MdOutlinePalette className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             <BsFolder className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
+            <BiSearch className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
           </div>
         </div>
       </div>

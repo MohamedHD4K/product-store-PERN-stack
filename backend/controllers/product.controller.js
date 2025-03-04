@@ -29,7 +29,7 @@ export const getProduct = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const { title, description, price, image } = req.body
-        console.log(req.body);
+
         const query = `
         INSERT INTO products (title, description, price, image)
         VALUES ($1, $2, $3, $4);`

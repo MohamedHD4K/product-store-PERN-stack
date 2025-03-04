@@ -6,25 +6,57 @@ const Product = ({
   title,
   description,
   price,
+  onDelete,
+  onEdit,
+  onShow,
+  id,
+  isPending,
 }: {
   image: string;
   title: string;
   price: number;
   description: string;
+  id: number;
+  isPending: boolean;
+  onDelete?: React.MouseEventHandler<HTMLButtonElement>;
+  onEdit?: React.MouseEventHandler<HTMLButtonElement>;
+  onShow?: React.MouseEventHandler<HTMLDivElement>;
 }) => {
   return (
-    <div className="card bg-base-300 shadow-sm rounded-2xl">
-      <img src={image} alt={title + "image"} className="h-40 object-cover rounded-t-2xl" />
+    <div
+      id={id.toString()}
+      onClick={onShow}
+      className="card bg-base-300 shadow-lg rounded-2xl hover:translate-1 transition-all cursor-pointer"
+    >
+      <img
+        src={image}
+        alt={title + "image"}
+        className="h-50 object-cover rounded-t-2xl"
+      />
       <div className="card-body">
-        <h1 className="card-title">{title}</h1>
-        <p>{description}</p>
-        <p>{price}$</p>
+        <h1 className="card-title text-3xl text-primary">{title}</h1>
+        <p className="text-lg">{description}</p>
+        <p className="text-success text-2xl font-bold">{price}$</p>
         <div className="card-actions justify-end">
-          <button className="btn btn-primary btn-outline rounded-xl">
-            <FaRegEdit className="size-5" />
+          <button
+            onClick={onEdit}
+            className="btn btn-primary btn-outline rounded-xl"
+          >
+            {!isPending ? (
+              <span className="loading loading-spinner loading-sm"></span>
+            ) : (
+              <FaRegEdit className="size-5" />
+            )}
           </button>
-          <button className="btn btn-error btn-outline rounded-xl">
-            <MdDeleteOutline className="size-5" />
+          <button
+            className="btn btn-error btn-outline rounded-xl"
+            onClick={onDelete}
+          >
+            {!isPending ? (
+              <span className="loading loading-spinner loading-sm"></span>
+            ) : (
+              <MdDeleteOutline className="size-5" />
+            )}
           </button>
         </div>
       </div>

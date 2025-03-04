@@ -18,13 +18,13 @@ const Input: React.FC<InputType> = ({
   value,
 }) => {
   return (
-    <div>
+    <div className="flex flex-col gap-1">
       {label && <label htmlFor={name}>{label}</label>}
       <input
         type={type}
         name={name}
         placeholder={placeholder}
-        className="input duration-150"
+        className="input duration-150 w-full"
         onChange={onChange}
         value={value}
       />

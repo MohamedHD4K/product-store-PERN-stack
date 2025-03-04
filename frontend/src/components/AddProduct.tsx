@@ -1,7 +1,7 @@
 import { BiPlus } from "react-icons/bi";
 import { LuRefreshCcw } from "react-icons/lu";
 import Input from "./shared/Input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -12,9 +12,14 @@ const AddProduct = () => {
     image: "",
     price: "",
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleShowModal = () => {
-    (document.getElementById("add_product") as HTMLDialogElement).showModal();
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +27,7 @@ const AddProduct = () => {
     setValue((prev) => ({ ...prev, [name]: value }));
   };
 
-  const creatProductFetching = async () => {
+  const createProductFetching = async () => {
     const response = await fetch("http://localhost:3000/api/products", {
       headers: {
         Accept: "application/json",
@@ -37,9 +42,9 @@ const AddProduct = () => {
     return response.json();
   };
 
-  const { data, error, mutate , isPending} = useMutation({
+  const { data, error, mutate, isPending } = useMutation({
     mutationKey: ["product"],
-    mutationFn: creatProductFetching,
+    mutationFn: createProductFetching,
     onError: () => {
       toast.error("There was an error creating the product.");
       console.log(error);
@@ -55,67 +60,90 @@ const AddProduct = () => {
     mutate();
   };
 
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isModalOpen]);
+
   return (
     <div className="flex justify-between items-center p-1 py-4">
-      <dialog id="add_product" className="modal">
-        <form onSubmit={handleSubmit}>
-          <div className="modal-box ">
-            <h3 className="font-bold text-lg">Add Prodcut</h3>
-            <div className="py-4 flex flex-col gap-3">
-              <Input
-                name="title"
-                type="text"
-                placeholder="Enter Product Name"
-                label="Product Name"
-                onChange={handleChange}
-                value={value.title}
-              />
-              <Input
-                name="description"
-                type="text"
-                placeholder="Enter Product Description"
-                label="Product Description"
-                onChange={handleChange}
-                value={value.description}
-              />
-              <Input
-                name="image"
-                type="text"
-                placeholder="Enter Product Image"
-                label="Product Image"
-                onChange={handleChange}
-                value={value.image}
-              />
-              <Input
-                name="price"
-                type="text"
-                placeholder="Enter Product Price"
-                label="Product Price"
-                onChange={handleChange}
-                value={value.price}
-              />
-            </div>
+      {isModalOpen && (
+        <dialog className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen  bg-opacity-50">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col bg-base-100 gap-4 z-40 popup-animation p-8 rounded-lg shadow-lg max-w-md w-full"
+          >
+            <h3 className="font-bold text-2xl text-primary text-center">
+              Add Prodcut
+            </h3>
+            <Input
+              name="title"
+              type="text"
+              placeholder="Enter product name"
+              label="Product Name"
+              onChange={handleChange}
+              value={value.title}
+            />
+            <Input
+              name="description"
+              type="text"
+              placeholder="Enter product description"
+              label="Product Description"
+              onChange={handleChange}
+              value={value.description}
+            />
+            <Input
+              name="image"
+              type="text"
+              placeholder="Enter product image"
+              label="Product Image"
+              onChange={handleChange}
+              value={value.image}
+            />
+            <Input
+              name="price"
+              type="text"
+              placeholder="Enter product price"
+              label="Product Price"
+              onChange={handleChange}
+              value={value.price}
+            />
             <div className="modal-action">
-              <form method="dialog">
-                <button className="btn btn-error">Close</button>
-              </form>
-                <button type="submit" className="btn btn-success">
-                  {isPending ? <span className="loading loading-spinner loading-sm mx-1.5"></span> : "Creat"}
-                </button>
+              <button onClick={handleCloseModal} className="btn btn-error">
+                Close
+              </button>
+              <button type="submit" className="btn btn-success">
+                {isPending ? (
+                  <span className="loading loading-spinner loading-sm mx-1.5"></span>
+                ) : (
+                  "Create"
+                )}
+              </button>
             </div>
-          </div>
-        </form>
-      </dialog>
+          </form>
+        </dialog>
+      )}
 
       <button
         className="btn btn-success rounded-full font-bold"
         onClick={handleShowModal}
       >
-        <BiPlus className="size-5" /> Add Product
+        <BiPlus className="size-5" />
+        <span>Add Product</span>
       </button>
 
       <ToastContainer />
-      <LuRefreshCcw className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
+      <LuRefreshCcw
+        onClick={() => window.location.reload()}
+        className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50"
+      />
     </div>
   );
 };

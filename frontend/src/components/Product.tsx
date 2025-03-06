@@ -1,5 +1,6 @@
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const Product = ({
   image,
@@ -28,8 +29,8 @@ const Product = ({
       onClick={onShow}
       className="card bg-base-300 shadow-lg rounded-2xl hover:translate-1 transition-all cursor-pointer"
     >
-      <img
-        src={image}
+      <LazyLoadImage
+        src={image ? image : "no-image.jpeg"}
         alt={title + "image"}
         className="h-50 object-cover rounded-t-2xl"
       />

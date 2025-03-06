@@ -1,20 +1,27 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-    themes: light --default, dark --prefersdark , cupcake , forest;
-  }
-
-*{
-    font-family: 'League Spartan' ;
-    
+  themes: light --default, dark --prefersdark, cupcake, forest;
 }
 
-.popup-animation{
-  animation: popup .3s forwards ease-out;
+@font-face {
+  font-family: "League Spartan";
+  src: url("./fonts/League_Spartan/LeagueSpartan-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900; /* Supports variable weights */
+  font-style: normal;
+}
+
+* {
+  font-family: "League Spartan";
+}
+
+.popup-animation {
+  animation: popup 0.3s forwards ease-out;
 }
 
 @keyframes popup {
   0% {
-    transform: scale(.9);
+    transform: scale(0.9);
   }
   50% {
     transform: scale(1.1);
@@ -22,4 +29,8 @@
   100% {
     transform: scale(1);
   }
+}
+
+.h-screen-nav {
+  height: 90vh;
 }

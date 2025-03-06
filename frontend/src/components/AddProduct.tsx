@@ -43,7 +43,7 @@ const AddProduct = () => {
     return response.json();
   };
 
-  const { data, error, mutate, isPending } = useMutation({
+  const { error, mutate, isPending } = useMutation({
     mutationKey: ["product"],
     mutationFn: createProductFetching,
     onError: () => {
@@ -83,44 +83,56 @@ const AddProduct = () => {
   return (
     <div className="flex justify-between items-center p-1 py-4">
       {isModalOpen && (
-        <dialog className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen z-30 bg-opacity-50">
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen z-30 bg-opacity-50">
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col bg-base-100 gap-4 popup-animation p-8 rounded-lg shadow-lg max-w-md w-full"
+            className="bg-base-200 popup-animation p-4 px-6 rounded"
           >
-            <h3 className="font-bold text-2xl text-primary">Add Prodcut</h3>
-            <Input
-              name="title"
-              type="text"
-              placeholder="Enter product name"
-              label="Name"
-              onChange={handleChange}
-              value={value.title}
-            />
-            <Input
-              name="description"
-              type="text"
-              placeholder="Enter product description"
-              label="Description"
-              onChange={handleChange}
-              value={value.description}
-            />
-            <Input
-              name="image"
-              type="text"
-              placeholder="Enter product image"
-              label="Image"
-              onChange={handleChange}
-              value={value.image}
-            />
-            <Input
-              name="price"
-              type="text"
-              placeholder="Enter product price"
-              label="Price"
-              onChange={handleChange}
-              value={value.price}
-            />
+            <h3 className="font-bold text-2xl text-primary my-1">
+              Add Prodcut
+            </h3>
+            <p className="text-lg pb-1">Create new product template</p>
+            <div className="flex gap-3 items-center">
+              <img
+                src={value.image || "no-image.jpeg"}
+                alt="product image"
+                className="object-cover w-sm h-80 rounded"
+              />
+              <div className="flex w-sm flex-col gap-4">
+                <Input
+                  name="title"
+                  type="text"
+                  placeholder="Enter product name"
+                  label="Name"
+                  onChange={handleChange}
+                  value={value.title}
+                />
+                <Input
+                  name="description"
+                  type="text"
+                  placeholder="Enter product description"
+                  label="Description"
+                  onChange={handleChange}
+                  value={value.description}
+                />
+                <Input
+                  name="image"
+                  type="text"
+                  placeholder="Enter product image"
+                  label="Image"
+                  onChange={handleChange}
+                  value={value.image}
+                />
+                <Input
+                  name="price"
+                  type="number"
+                  placeholder="Enter product price"
+                  label="Price"
+                  onChange={handleChange}
+                  value={value.price}
+                />
+              </div>
+            </div>
             <div className="modal-action">
               <button
                 onClick={handleCloseModal}
@@ -137,7 +149,7 @@ const AddProduct = () => {
               </button>
             </div>
           </form>
-        </dialog>
+        </div>
       )}
 
       <button

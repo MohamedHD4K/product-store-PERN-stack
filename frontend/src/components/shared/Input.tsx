@@ -7,6 +7,7 @@ interface InputType {
   label?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   value?: string;
+  required?: boolean;
 }
 
 const Input: React.FC<InputType> = ({
@@ -16,6 +17,7 @@ const Input: React.FC<InputType> = ({
   label,
   onChange,
   value,
+  required,
 }) => {
   return (
     <div className="flex flex-col gap-1">
@@ -27,6 +29,7 @@ const Input: React.FC<InputType> = ({
         className="input duration-150 w-full rounded"
         onChange={onChange}
         value={value}
+        required={required}
       />
     </div>
   );

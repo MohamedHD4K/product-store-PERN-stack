@@ -31,7 +31,8 @@ const ProductPage = () => {
       <div className="flex gap-5 bg-base-300 m-2 p-5 w-7xl rounded-xl  ">
         <div className="flex flex-col gap-3 w-3xl">
           <img
-            src={data[0].image}
+            loading="lazy"
+            src={data[0].image ? data[0].image : "../no-image.jpeg"}
             className="object-cover w-3xl rounded"
             alt={`${data[0].title} Image`}
           />

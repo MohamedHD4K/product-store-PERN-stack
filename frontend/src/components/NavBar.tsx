@@ -3,8 +3,14 @@ import { IoCartOutline } from "react-icons/io5";
 import { BsFolder } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { BiSearch } from "react-icons/bi";
+import SideBar from "./SideBar";
+import { useState } from "react";
 
 const NavBar = () => {
+  const [isShowProfileModal, setIsShowProfileModal] = useState(false);
+
+  const handleShowSideBar = () => setIsShowProfileModal((prev) => !prev);
+
   return (
     <div className="bg-base-200/80 backdrop-blur-lg border-b border-base-content/10 sticky top-0 z-20">
       <div className="max-w-7xl mx-auto">
@@ -20,13 +26,21 @@ const NavBar = () => {
             </span>
           </Link>
           {/* RIGHT SECTION */}
-          <div className="flex gap-10 justify-center">
+          <div className="flex gap-10 justify-center items-center">
             <MdOutlinePalette className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             <BsFolder className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             <BiSearch className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
+            <img
+              src="avatar.png"
+              alt="User avatar"
+              loading="lazy"
+              onClick={handleShowSideBar}
+              className="size-6 hover:scale-120 cursor-pointer duration-150 hover:opacity-80 rounded-md"
+            />
           </div>
         </div>
       </div>
+      {isShowProfileModal && <SideBar />}
     </div>
   );
 };

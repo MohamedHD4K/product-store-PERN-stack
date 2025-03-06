@@ -133,9 +133,9 @@ function HomePage() {
     <div className="mx-auto lg:max-w-7xl md:max-w-3xl sm:max-w-xl">
       <AddProduct />
       {isModalOpen && (
-        <div className="fixed inset-0 flex flex-col items-center justify-center popup-animation bg-black/40 w-full h-screen z-30 bg-opacity-50">
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 w-full h-screen z-30 bg-opacity-50">
           <form
-            className="bg-base-200 p-4 px-6 rounded"
+            className="bg-base-200 popup-animation p-4 px-6 rounded"
             onSubmit={handleEditProduct}
           >
             <h1 className="font-bold text-2xl text-primary my-1">
@@ -200,6 +200,7 @@ function HomePage() {
           </form>
         </div>
       )}
+
       <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-5 mx-1">
         {productsData.map((product: ProductType) => (
           <Product

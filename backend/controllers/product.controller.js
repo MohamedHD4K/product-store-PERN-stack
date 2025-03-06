@@ -30,6 +30,11 @@ export const createProduct = async (req, res) => {
     try {
         const { title, description, price, image } = req.body
 
+        if (!title || !description || !price || !image) {
+            return res.status(400).json({ error: "title, description, price and image required" })
+        }
+
+
         const query = `
         INSERT INTO products (title, description, price, image)
         VALUES ($1, $2, $3, $4);`

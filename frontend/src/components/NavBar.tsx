@@ -5,11 +5,35 @@ import { Link } from "react-router-dom";
 import { BiSearch } from "react-icons/bi";
 import SideBar from "./SideBar";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const NavBar = () => {
   const [isShowProfileModal, setIsShowProfileModal] = useState(false);
 
   const handleShowSideBar = () => setIsShowProfileModal((prev) => !prev);
+
+  const { data: userData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/users/me", {
+          credentials: "include",
+          method: "GET",
+        });
+        const result = await response.json();
+
+        if (result.error) return null;
+        if (!response.ok)
+          throw new Error(result.error || "Something went wrong");
+
+        return result;
+      } catch (error) {
+        console.log(error);
+        throw new Error(String(error));
+      }
+    },
+    retry: false,
+  });
 
   return (
     <div className="bg-base-200/80 backdrop-blur-lg border-b border-base-content/10 sticky top-0 z-20">
@@ -30,13 +54,17 @@ const NavBar = () => {
             <MdOutlinePalette className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             <BsFolder className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             <BiSearch className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
-            <img
-              src="avatar.png"
-              alt="User avatar"
-              loading="lazy"
-              onClick={handleShowSideBar}
-              className="size-6 hover:scale-120 cursor-pointer duration-150 hover:opacity-80 rounded-md"
-            />
+            {isLoading ? (
+              <span className="loading loading-spinner" />
+            ) : (
+              <img
+                src={userData ? userData.avatar : "avatar.png"}
+                alt="User avatar"
+                loading="lazy"
+                onClick={handleShowSideBar}
+                className="size-6 hover:scale-120 cursor-pointer duration-150 hover:opacity-80 rounded-md"
+              />
+            )}
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import AddProduct from "../components/AddProduct";
 import Product from "../components/Product";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/shared/Input";
 
@@ -217,6 +217,7 @@ function HomePage() {
           />
         ))}
       </div>
+      <ToastContainer />
     </div>
   );
 }

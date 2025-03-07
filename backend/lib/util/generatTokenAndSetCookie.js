@@ -10,6 +10,8 @@ function generatTokenAndSetCookie(userId, res) {
         sameSite: "strict", //CSRF Attack
         secure: process.env.NODE_ENV !== "development",
     });
+
+    console.log("Set-Cookie header:", res.getHeaders()["set-cookie"]); // Debugging
 }
 
 export default generatTokenAndSetCookie

@@ -23,29 +23,29 @@ const SignupPage = () => {
     setValue((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchSignUp = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/auth/signup", {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(value),
-      });
-
-      if (!response.ok) throw new Error("have some error");
-
-      return response.json();
-    } catch (error) {
-      console.log(error);
-      throw new Error("have some error");
-    }
-  };
-
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["user"],
-    mutationFn: fetchSignUp,
+    mutationFn: async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/auth/signup", {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify(value),
+        });
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.error || "Something went wrong");
+
+        return data;
+      } catch (error) {
+        console.log(error);
+        throw new Error(String(error));
+      }
+    },
     onSuccess: () => {
       toast.success("account created successfully");
     },
@@ -62,7 +62,7 @@ const SignupPage = () => {
   return (
     <div className="w-full flex justify-center items-center">
       <div className="p-5 h-screen-nav w-7xl flex justify-between">
-        <div className="w-full">
+        <div className="w-full hidden lg:block">
           <div className="w-xl bg-base-100 h-full border rounded-3xl"></div>
         </div>
         <div className="flex justify-center items-center w-full">
@@ -110,6 +110,7 @@ const SignupPage = () => {
                   required
                 />
               </div>
+              {isError && <div className="text-red-500">{error.message}</div>}
               <div className="flex gap-2 justify-center mt-2">
                 <span>Already have an account?</span>
                 <Link

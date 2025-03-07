@@ -10,10 +10,10 @@ function App() {
     <BrowserRouter>
       <NavBar />
       <Routes>
-        <Route path="/" Component={HomePage} />
-        <Route path="/product/:title" Component={ProductPage} />
-        <Route path="/signup" Component={SignupPage} />
-        <Route path="/login" Component={LoginPage} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/product/:title" element={<ProductPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </BrowserRouter>
   );

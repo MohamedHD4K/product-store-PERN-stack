@@ -17,9 +17,10 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(helmet()); // security middleware    
 app.use(morgan("dev")); // logger middleware
-app.use(express.json()); // req.body parser to JSON middleware
-app.use(cors()); // CORS middleware
-app.use(cookieParser());
+app.use(express.json({ limit: "5mb" })); // req.body parser to JSON middleware
+app.use(cookieParser()); // Parse cookies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded form data
+app.use(cors({  origin : "http://localhost:4000" ,credentials: true, }))
 
 // Apply Arcjet rate-limit to all routes
 app.use(async (req, res, next) => {

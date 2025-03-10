@@ -6,14 +6,16 @@ import { BiSearch } from "react-icons/bi";
 import SideBar from "./SideBar";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import Input from "./shared/Input";
 
 const NavBar = () => {
   const [isShowProfileModal, setIsShowProfileModal] = useState(false);
 
   const handleShowSideBar = () => setIsShowProfileModal((prev) => !prev);
+  const handleCloseSidebar = () => setIsShowProfileModal(false);
 
   const { data: userData, isLoading } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["users"],
     queryFn: async () => {
       try {
         const response = await fetch("http://localhost:3000/api/users/me", {
@@ -36,7 +38,11 @@ const NavBar = () => {
   });
 
   return (
-    <div className="bg-base-200/80 backdrop-blur-lg border-b border-base-content/10 sticky top-0 z-20">
+    <div
+      className={`bg-base-200/80 backdrop-blur-lg border-b border-base-content/10 sticky top-0 z-20 ${
+        !userData && "hidden"
+      }`}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="navbar min-h-[4rem] justify-between">
           {/* LOGO */}
@@ -49,16 +55,23 @@ const NavBar = () => {
               Products Store
             </span>
           </Link>
+          <div className="w-lg">
+            <Input
+              type="text"
+              icon={<BiSearch size={17} />}
+              placeholder="Search"
+              name="search"
+            />
+          </div>
           {/* RIGHT SECTION */}
           <div className="flex gap-10 justify-center items-center">
             <MdOutlinePalette className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             <BsFolder className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
-            <BiSearch className="size-5 hover:scale-120 cursor-pointer duration-150 hover:opacity-50" />
             {isLoading ? (
               <span className="loading loading-spinner" />
             ) : (
               <img
-                src={userData ? userData.avatar : "avatar.png"}
+                src={userData?.avatar || "avatar.png"}
                 alt="User avatar"
                 loading="lazy"
                 onClick={handleShowSideBar}
@@ -68,7 +81,9 @@ const NavBar = () => {
           </div>
         </div>
       </div>
-      {isShowProfileModal && <SideBar />}
+      {isShowProfileModal && (
+        <SideBar user={userData} onClose={handleCloseSidebar} />
+      )}
     </div>
   );
 };

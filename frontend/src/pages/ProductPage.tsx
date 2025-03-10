@@ -9,17 +9,23 @@ const ProductPage = () => {
   const { pathname } = useResolvedPath("");
   const id = pathname.split("/").pop();
 
-  const getProductFetch = async () => {
-    const response = await fetch(`http://localhost:3000/api/products/${id}`);
-
-    if (!response.ok) throw new Error("Failed to fetch products");
-
-    return response.json();
-  };
-
   const { data, isLoading } = useQuery({
     queryKey: ["product"],
-    queryFn: getProductFetch,
+    queryFn: async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/products/${id}`
+        );
+        const data = await response.json();
+
+        if (!response.ok)
+          throw new Error(data.message || "Failed to fetch products");
+
+        return data;
+      } catch (error) {
+        throw new Error(String(error) || "Failed to fetch products");
+      }
+    },
   });
 
   if (isLoading) return <LoadingSpinner />;

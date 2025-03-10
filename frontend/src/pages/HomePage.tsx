@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/shared/Input";
+import { MdOutlineDescription, MdPriceCheck } from "react-icons/md";
+import { BsCardText } from "react-icons/bs";
+import { BiImage } from "react-icons/bi";
 
 interface ProductType {
   image: string;
@@ -60,7 +63,7 @@ function HomePage() {
     onError: () => toast.error("There was an error deleting the product."),
     onSuccess: () => {
       toast.success("Product deleted successfully!");
-      queryClient.invalidateQueries(["products"]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 
@@ -84,7 +87,7 @@ function HomePage() {
     onError: () => toast.error("There was an error editing the product."),
     onSuccess: () => {
       toast.success("Product edited successfully!");
-      queryClient.invalidateQueries(["products"]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       handleCloseModal();
     },
   });
@@ -153,6 +156,7 @@ function HomePage() {
                 <Input
                   name="title"
                   type="text"
+                  icon={<BsCardText size={16} />}
                   placeholder="Enter product name"
                   label="Name"
                   onChange={handleChange}
@@ -161,6 +165,7 @@ function HomePage() {
                 <Input
                   name="description"
                   type="text"
+                  icon={<MdOutlineDescription size={16} />}
                   placeholder="Enter product description"
                   label="Description"
                   onChange={handleChange}
@@ -169,6 +174,7 @@ function HomePage() {
                 <Input
                   name="image"
                   type="text"
+                  icon={<BiImage size={16} />}
                   placeholder="Enter product image"
                   label="Image"
                   onChange={handleChange}
@@ -177,6 +183,7 @@ function HomePage() {
                 <Input
                   name="price"
                   type="number"
+                  icon={<MdPriceCheck size={16} />}
                   placeholder="Enter product price"
                   label="Price"
                   onChange={handleChange}
@@ -207,7 +214,7 @@ function HomePage() {
             isPending
             key={product.id}
             id={product.id}
-            image={product.image}
+            image={product.image ? product.image : "no-image.jpeg"}
             title={product.title}
             description={product.description}
             price={product.price}

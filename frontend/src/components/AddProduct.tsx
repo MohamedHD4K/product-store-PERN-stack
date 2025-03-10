@@ -1,9 +1,11 @@
-import { BiPlus } from "react-icons/bi";
+import { BiImage, BiPlus } from "react-icons/bi";
 import { LuRefreshCcw } from "react-icons/lu";
 import Input from "./shared/Input";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
+import { MdOutlineDescription, MdPriceCheck } from "react-icons/md";
+import { BsCardText } from "react-icons/bs";
 
 const AddProduct = () => {
   const queryClient = useQueryClient();
@@ -28,31 +30,32 @@ const AddProduct = () => {
     setValue((prev) => ({ ...prev, [name]: value }));
   };
 
-  const createProductFetching = async () => {
-    const response = await fetch("http://localhost:3000/api/products", {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(value),
-    });
-
-    if (!response.ok) throw Error("Feiled Fetch Products");
-
-    return response.json();
-  };
-
-  const { error, mutate, isPending } = useMutation({
+  const { error, mutate, isPending, isError } = useMutation({
     mutationKey: ["product"],
-    mutationFn: createProductFetching,
-    onError: () => {
-      toast.error("There was an error creating the product.");
-      console.log(error);
+    mutationFn: async () => {
+      const response = await fetch("http://localhost:3000/api/products", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify(value),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok)
+        throw Error(data.message ? data.message : "Feiled Fetch Products");
+
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
     onSuccess: () => {
       toast.success("Product Created Successfully!");
-      queryClient.invalidateQueries(["products"]);
+      queryClient.invalidateQueries({queryKey : ["products"]});
       setValue({
         title: "",
         description: "",
@@ -102,6 +105,7 @@ const AddProduct = () => {
                 <Input
                   name="title"
                   type="text"
+                  icon={<BsCardText size={16} />}
                   placeholder="Enter product name"
                   label="Name"
                   onChange={handleChange}
@@ -110,6 +114,7 @@ const AddProduct = () => {
                 <Input
                   name="description"
                   type="text"
+                  icon={<MdOutlineDescription size={16} />}
                   placeholder="Enter product description"
                   label="Description"
                   onChange={handleChange}
@@ -118,6 +123,7 @@ const AddProduct = () => {
                 <Input
                   name="image"
                   type="text"
+                  icon={<BiImage size={16} />}
                   placeholder="Enter product image"
                   label="Image"
                   onChange={handleChange}
@@ -126,6 +132,7 @@ const AddProduct = () => {
                 <Input
                   name="price"
                   type="number"
+                  icon={<MdPriceCheck size={16} />}
                   placeholder="Enter product price"
                   label="Price"
                   onChange={handleChange}
@@ -133,6 +140,7 @@ const AddProduct = () => {
                 />
               </div>
             </div>
+            {isError && <span className="text-red-500">{error.message}</span>}
             <div className="modal-action">
               <button
                 onClick={handleCloseModal}

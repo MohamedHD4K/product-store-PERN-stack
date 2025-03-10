@@ -1,23 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../components/shared/Input";
 import Divider from "../components/shared/Divider";
 import { FaFacebookF } from "react-icons/fa6";
 import { FaXTwitter } from "react-icons/fa6";
-import { BsInstagram } from "react-icons/bs";
+import { BsInstagram, BsPerson } from "react-icons/bs";
 import { FaGithub } from "react-icons/fa6";
 import { FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
+import { MdPassword, MdVisibility, MdVisibilityOff } from "react-icons/md";
+import SignupLottie from "../components/lottie/SignupLottie";
 
 const SignupPage = () => {
+  const [visible, setVisible] = useState(false);
   const [value, setValue] = useState({
     username: "",
     password: "",
   });
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setValue((prev) => ({ ...prev, [name]: value }));
@@ -54,8 +57,8 @@ const SignupPage = () => {
       }
     },
     onSuccess: () => {
-      navigate("/");
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      navigate("/");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -67,11 +70,20 @@ const SignupPage = () => {
     mutate(value);
   };
 
+  const handleVisible = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setVisible((prev) => !prev);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden"
+  } , [])
+
   return (
     <div className="w-full flex justify-center items-center">
-      <div className="p-5 h-screen-nav w-7xl flex justify-between">
-        <div className="w-full hidden lg:inline">
-          <div className="w-xl bg-base-100 h-full border rounded-3xl"></div>
+      <div className="p-5 h-screen w-7xl flex justify-between">
+        <div className="w-full justify-center items-center hidden lg:flex">
+          <SignupLottie />
         </div>
         <div className="flex justify-center items-center w-full">
           <div className="flex flex-col gap-4">
@@ -84,16 +96,26 @@ const SignupPage = () => {
                 <Input
                   type="text"
                   label="Username"
+                  icon={<BsPerson size={16} />}
                   placeholder="Enter your username"
                   name="username"
                   onChange={handleChange}
                   value={value.username}
                 />
                 <Input
-                  type="password"
+                  type={visible ? "text" : "password"}
                   label="Password"
+                  icon={<MdPassword size={16} />}
                   placeholder="Enter your password"
                   name="password"
+                  onVisible={handleVisible}
+                  profixIcon={
+                    visible ? (
+                      <MdVisibility size={16} />
+                    ) : (
+                      <MdVisibilityOff size={16} />
+                    )
+                  }
                   onChange={handleChange}
                   value={value.password}
                 />

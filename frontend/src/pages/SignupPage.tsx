@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../components/shared/Input";
 import Divider from "../components/shared/Divider";
+import SignupLottie from "../components/lottie/SignupLottie";
 import { FaFacebookF } from "react-icons/fa6";
 import { FaXTwitter } from "react-icons/fa6";
-import { BsInstagram } from "react-icons/bs";
+import { BsInstagram, BsPerson } from "react-icons/bs";
 import { FaGithub } from "react-icons/fa6";
 import { FaGoogle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast, ToastContainer } from "react-toastify";
+import {
+  MdEmail,
+  MdPassword,
+  MdVisibility,
+  MdVisibilityOff,
+} from "react-icons/md";
+import { BiUser } from "react-icons/bi";
 
 const SignupPage = () => {
+  const [visible, setVisible] = useState(false);
+
   const [value, setValue] = useState({
     fullname: "",
     username: "",
@@ -59,13 +69,22 @@ const SignupPage = () => {
     mutate();
   };
 
+  const handleVisible = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setVisible((prev) => !prev);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+  }, []);
+
   return (
     <div className="w-full flex justify-center items-center">
-      <div className="p-5 h-screen-nav w-7xl flex justify-between">
-        <div className="w-full hidden lg:block">
-          <div className="w-xl bg-base-100 h-full border rounded-3xl"></div>
+      <div className="p-5 h-screen w-7xl flex justify-between">
+        <div className="w-full justify-center items-center hidden lg:flex">
+          <SignupLottie />
         </div>
-        <div className="flex justify-center items-center w-full">
+        <div className="flex justify-center mt-10 w-full">
           <div className="flex flex-col gap-4">
             <span className="font-bold text-4xl">Sign Up</span>
             <span className="font-medium text-xl">
@@ -76,6 +95,7 @@ const SignupPage = () => {
                 <Input
                   type="text"
                   label="Full Name"
+                  icon={<BiUser size={16} />}
                   placeholder="Enter your fullname"
                   name="fullname"
                   onChange={handleChange}
@@ -85,6 +105,7 @@ const SignupPage = () => {
                 <Input
                   type="text"
                   label="Username"
+                  icon={<BsPerson size={16} />}
                   placeholder="Enter your username"
                   name="username"
                   onChange={handleChange}
@@ -94,6 +115,7 @@ const SignupPage = () => {
                 <Input
                   type="text"
                   label="Email"
+                  icon={<MdEmail size={16} />}
                   placeholder="Enter your email"
                   name="email"
                   onChange={handleChange}
@@ -101,8 +123,17 @@ const SignupPage = () => {
                   required
                 />
                 <Input
-                  type="password"
+                  type={visible ? "text" : "password"}
                   label="Password"
+                  onVisible={handleVisible}
+                  profixIcon={
+                    visible ? (
+                      <MdVisibility size={16} />
+                    ) : (
+                      <MdVisibilityOff size={16} />
+                    )
+                  }
+                  icon={<MdPassword size={16} />}
                   placeholder="Enter your password"
                   name="password"
                   onChange={handleChange}
